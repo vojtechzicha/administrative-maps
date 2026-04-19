@@ -16,3 +16,6 @@ desktop.ini
 # Local
 _filelist.txt
 *.log
+
+# Local Netlify folder
+.netlify
