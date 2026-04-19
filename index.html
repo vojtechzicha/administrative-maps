@@ -1,0 +1,1175 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Správní mapy ČR — Edice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..700,0..100&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0e7d2;
+    --bg-raised: #f7efd9;
+    --bg-deep: #e8dcbe;
+    --ink: #1a1d29;
+    --ink-2: #2c2f3d;
+    --ink-muted: #5a5548;
+    --ink-faint: #8e8773;
+    --accent: #a62e1b;
+    --accent-deep: #7a1c0c;
+    --accent-soft: #d66b4e;
+    --rule: #cec08f;
+    --rule-faint: #ded2a8;
+    --grid: #d8ccaa;
+    --paper-shadow: 0 1px 0 rgba(26,29,41,.04), 0 30px 60px -30px rgba(26,29,41,.22);
+    --serif: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 14, "SOFT" 30, "wght" 400;
+    color: var(--ink);
+    background: var(--bg);
+    background-image:
+      radial-gradient(1200px 600px at 10% -10%, rgba(166,46,27,.05), transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, rgba(26,29,41,.04), transparent 60%);
+    min-height: 100vh;
+    line-height: 1.45;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(26,29,41,.014) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgba(26,29,41,.014) 0 1px, transparent 1px 3px);
+    mix-blend-mode: multiply;
+    z-index: 0;
+  }
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.15 0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: .55;
+    mix-blend-mode: multiply;
+    z-index: 0;
+  }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+
+  /* Top bar */
+  .bar {
+    position: sticky; top: 0; z-index: 40;
+    background: color-mix(in oklab, var(--bg) 82%, transparent);
+    backdrop-filter: blur(12px) saturate(120%);
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
+    border-bottom: 1px solid var(--rule-faint);
+  }
+  .bar-inner {
+    max-width: 1440px; margin: 0 auto;
+    padding: 14px 40px;
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px;
+  }
+  .brand {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--ink); font-weight: 600;
+    display: flex; align-items: center; gap: 10px; text-decoration: none;
+  }
+  .brand .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent); }
+  .bar-meta { font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); text-align: center; }
+  .search-trigger {
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 9px 12px 9px 14px; border: 1px solid var(--rule);
+    background: var(--bg-raised); border-radius: 999px;
+    color: var(--ink-muted); font-family: var(--mono); font-size: 11px; letter-spacing: .08em;
+    cursor: pointer; transition: all .2s ease;
+  }
+  .search-trigger:hover { border-color: var(--ink); color: var(--ink); transform: translateY(-1px); }
+  .search-trigger kbd {
+    font-family: var(--mono); font-size: 10px;
+    padding: 2px 6px; border: 1px solid var(--rule); border-radius: 4px;
+    background: var(--bg); color: var(--ink-muted);
+  }
+  .search-trigger .ico { width: 14px; height: 14px; opacity: .7; }
+
+  /* Main */
+  main { position: relative; z-index: 1; }
+  .wrap { max-width: 1440px; margin: 0 auto; padding: 0 40px; }
+
+  /* Home masthead */
+  .masthead { padding: 56px 0 24px; position: relative; }
+  .masthead-kicker {
+    display: flex; align-items: center; gap: 14px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--ink-muted); margin-bottom: 40px;
+  }
+  .masthead-kicker .line { flex: 1; height: 1px; background: var(--rule); }
+  .masthead-title {
+    font-family: var(--serif); font-weight: 400;
+    font-variation-settings: "opsz" 144, "SOFT" 40, "wght" 380;
+    font-size: clamp(3.2rem, 9vw, 8.5rem);
+    line-height: .9; letter-spacing: -0.035em;
+    margin: 0 0 22px;
+    color: var(--ink);
+  }
+  .masthead-title em {
+    font-style: italic; font-variation-settings: "opsz" 144, "SOFT" 60, "wght" 340;
+    color: var(--accent);
+  }
+  .masthead-sub {
+    display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 24px;
+    padding-top: 28px; border-top: 1px solid var(--ink);
+    margin-top: 18px;
+  }
+  .masthead-lede {
+    font-family: var(--serif); font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    font-variation-settings: "opsz" 32, "wght" 380;
+    max-width: 52ch; color: var(--ink-2); line-height: 1.5;
+  }
+  .masthead-stamp {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--ink-faint); text-align: right; line-height: 1.7;
+  }
+  .masthead-stamp strong { color: var(--ink); font-weight: 500; }
+
+  /* Section header */
+  .section-head {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 20px;
+    margin: 72px 0 28px;
+  }
+  .section-head h2 {
+    margin: 0;
+    font-family: var(--serif); font-variation-settings: "opsz" 48, "SOFT" 50, "wght" 420;
+    font-size: 1.45rem; letter-spacing: -0.01em; color: var(--ink);
+  }
+  .section-head .count {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .section-head .line { height: 1px; background: var(--rule); }
+
+  /* Region grid */
+  .regions {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--ink);
+    border-left: 1px solid var(--rule);
+  }
+  .region-card {
+    position: relative;
+    display: block; text-decoration: none; color: var(--ink);
+    padding: 28px 26px 26px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    background: transparent;
+    transition: background .25s ease, color .25s ease;
+    min-height: 220px;
+  }
+  .region-card:hover { background: var(--bg-raised); }
+  .region-card .idx {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: 18px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .region-card .idx .badge {
+    padding: 2px 7px; border: 1px solid var(--rule); border-radius: 3px; font-size: 9.5px;
+    background: var(--bg); color: var(--ink-muted);
+  }
+  .region-card .name {
+    font-family: var(--serif); font-variation-settings: "opsz" 72, "SOFT" 40, "wght" 440;
+    font-size: clamp(1.55rem, 2.2vw, 2rem);
+    line-height: 1.02; letter-spacing: -0.02em; margin: 0 0 14px;
+  }
+  .region-card .meta {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .region-card .arrow {
+    position: absolute; right: 24px; bottom: 22px;
+    width: 28px; height: 28px; display: grid; place-items: center;
+    border-radius: 50%; border: 1px solid var(--rule);
+    transition: all .25s ease;
+    color: var(--ink-muted);
+  }
+  .region-card:hover .arrow { background: var(--accent); border-color: var(--accent); color: var(--bg); transform: translate(2px, -2px); }
+  .region-card .rule {
+    position: absolute; left: 26px; right: 64px; bottom: 26px;
+    height: 1px; background: var(--rule-faint);
+  }
+  .region-card.has-map::before {
+    content: "";
+    position: absolute; top: 18px; right: 18px;
+    width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
+  }
+
+  /* Region detail */
+  .detail-head { padding: 48px 0 24px; }
+  .crumb {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--ink-muted); text-decoration: none;
+    padding: 7px 12px; border: 1px solid var(--rule); border-radius: 999px;
+    background: var(--bg-raised);
+    transition: all .2s ease;
+  }
+  .crumb:hover { border-color: var(--ink); color: var(--ink); }
+  .crumb svg { width: 10px; height: 10px; }
+  .detail-title {
+    font-family: var(--serif); font-variation-settings: "opsz" 144, "SOFT" 40, "wght" 360;
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    line-height: .92; letter-spacing: -0.035em;
+    margin: 28px 0 14px; color: var(--ink);
+  }
+  .detail-kicker {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px;
+  }
+  .detail-sub {
+    display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end;
+    padding-top: 20px; border-top: 1px solid var(--ink);
+  }
+  .detail-sub .count {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .standalone-map {
+    margin: 40px 0 80px;
+    padding: 32px;
+    background: var(--bg-raised);
+    border: 1px solid var(--rule);
+    box-shadow: var(--paper-shadow);
+    position: relative;
+  }
+  .standalone-map::before, .standalone-map::after {
+    content: ""; position: absolute; width: 10px; height: 10px;
+    border: 1px solid var(--ink-faint);
+  }
+  .standalone-map::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+  .standalone-map::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+  .standalone-map img { width: 100%; height: auto; display: block; cursor: zoom-in; }
+  .standalone-map .caption {
+    display: flex; justify-content: space-between; gap: 24px; margin-top: 20px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  /* Okres sections */
+  .okres { margin: 48px 0; }
+  .okres-head {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 20px;
+    margin-bottom: 18px;
+  }
+  .okres-head h3 {
+    margin: 0;
+    font-family: var(--serif); font-variation-settings: "opsz" 48, "SOFT" 50, "wght" 460;
+    font-size: 1.35rem; letter-spacing: -0.008em;
+  }
+  .okres-head .k {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .okres-head .line { height: 1px; background: var(--rule); }
+  .okres-head .n {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .orp-list {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0; border-top: 1px solid var(--rule); border-left: 1px solid var(--rule-faint);
+  }
+  .orp-card {
+    position: relative;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 18px 20px 16px;
+    border-right: 1px solid var(--rule-faint);
+    border-bottom: 1px solid var(--rule-faint);
+    text-decoration: none; color: var(--ink);
+    min-height: 110px;
+    transition: background .2s ease;
+  }
+  .orp-card:hover { background: var(--bg-raised); }
+  .orp-card .label {
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .orp-card .name {
+    font-family: var(--serif); font-variation-settings: "opsz" 48, "SOFT" 40, "wght" 440;
+    font-size: 1.25rem; line-height: 1.1; letter-spacing: -0.012em;
+    margin-top: 14px;
+  }
+  .orp-card .go {
+    position: absolute; right: 14px; top: 14px;
+    width: 22px; height: 22px; display: grid; place-items: center;
+    color: var(--ink-faint); transition: all .2s ease;
+  }
+  .orp-card:hover .go { color: var(--accent); transform: translate(2px, -2px); }
+
+  /* Map view */
+  .map-head { padding: 36px 0 20px; }
+  .map-breadcrumbs {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-muted); margin-bottom: 20px;
+  }
+  .map-breadcrumbs a { color: var(--ink-muted); text-decoration: none; }
+  .map-breadcrumbs a:hover { color: var(--accent); }
+  .map-breadcrumbs .sep { color: var(--ink-faint); }
+  .map-title {
+    font-family: var(--serif); font-variation-settings: "opsz" 144, "SOFT" 40, "wght" 360;
+    font-size: clamp(2.4rem, 5.5vw, 4.5rem);
+    line-height: .95; letter-spacing: -0.03em;
+    margin: 0 0 16px;
+  }
+  .map-context {
+    display: flex; gap: 32px; flex-wrap: wrap;
+    padding: 14px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .map-context dt { color: var(--ink-faint); font-size: 9.5px; letter-spacing: .2em; margin-bottom: 2px; }
+  .map-context dd { margin: 0; color: var(--ink-2); font-family: var(--serif); font-size: 14px; letter-spacing: 0; text-transform: none; font-variation-settings: "opsz" 14, "wght" 480; }
+  .map-figure {
+    margin: 32px 0 60px;
+    padding: 36px;
+    background: var(--bg-raised);
+    border: 1px solid var(--rule);
+    box-shadow: var(--paper-shadow);
+    position: relative;
+  }
+  .map-figure::before, .map-figure::after {
+    content: ""; position: absolute; width: 14px; height: 14px;
+    border: 1px solid var(--ink-faint);
+  }
+  .map-figure::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+  .map-figure::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+  .map-figure img { width: 100%; height: auto; display: block; cursor: zoom-in; }
+  .map-foot {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    margin-top: 22px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .map-nav {
+    display: flex; justify-content: space-between; gap: 20px; margin: 40px 0 80px;
+    padding-top: 24px; border-top: 1px solid var(--ink);
+  }
+  .map-nav a {
+    flex: 1; display: flex; flex-direction: column; gap: 6px;
+    text-decoration: none; color: var(--ink);
+    padding: 16px 0;
+    transition: color .2s ease;
+  }
+  .map-nav a:hover { color: var(--accent); }
+  .map-nav a .dir {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .map-nav a .t {
+    font-family: var(--serif); font-variation-settings: "opsz" 32, "SOFT" 40, "wght" 420;
+    font-size: 1.15rem; line-height: 1.1;
+  }
+  .map-nav a.next { text-align: right; }
+  .map-nav a.disabled { opacity: .3; pointer-events: none; }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100;
+    background: color-mix(in oklab, var(--ink) 88%, transparent);
+    display: none; align-items: center; justify-content: center;
+    padding: 40px; cursor: zoom-out;
+    opacity: 0; transition: opacity .2s ease;
+  }
+  .lightbox.open { display: flex; opacity: 1; }
+  .lightbox img { max-width: 100%; max-height: 100%; box-shadow: 0 20px 80px rgba(0,0,0,.5); }
+
+  /* Command palette */
+  .palette-overlay {
+    position: fixed; inset: 0; z-index: 80;
+    background: color-mix(in oklab, var(--ink) 50%, transparent);
+    display: none; align-items: flex-start; justify-content: center;
+    padding: 12vh 20px 40px;
+    opacity: 0; transition: opacity .18s ease;
+    backdrop-filter: blur(4px);
+  }
+  .palette-overlay.open { display: flex; opacity: 1; }
+  .palette {
+    width: 100%; max-width: 680px;
+    background: var(--bg-raised);
+    border: 1px solid var(--ink);
+    box-shadow: 0 30px 80px -10px rgba(0,0,0,.35);
+    display: flex; flex-direction: column;
+    max-height: 72vh;
+    transform: translateY(-6px); transition: transform .2s ease;
+  }
+  .palette-overlay.open .palette { transform: translateY(0); }
+  .palette-input {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 20px; border-bottom: 1px solid var(--rule);
+  }
+  .palette-input svg { width: 16px; height: 16px; color: var(--ink-muted); flex-shrink: 0; }
+  .palette-input input {
+    flex: 1; border: none; outline: none; background: transparent;
+    font-family: var(--serif); font-variation-settings: "opsz" 24, "wght" 400;
+    font-size: 1.25rem; color: var(--ink);
+    padding: 4px 0;
+  }
+  .palette-input input::placeholder { color: var(--ink-faint); font-style: italic; }
+  .palette-input .esc {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    padding: 4px 8px; border: 1px solid var(--rule); border-radius: 4px;
+    color: var(--ink-muted); background: var(--bg);
+  }
+  .palette-results { flex: 1; overflow-y: auto; padding: 6px 0; }
+  .palette-group {
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--ink-faint); padding: 10px 20px 6px;
+    display: flex; justify-content: space-between;
+  }
+  .palette-item {
+    display: grid; grid-template-columns: 18px 1fr auto; align-items: center; gap: 14px;
+    padding: 10px 20px; cursor: pointer;
+    text-decoration: none; color: var(--ink);
+    border-left: 2px solid transparent;
+  }
+  .palette-item.active { background: var(--bg-deep); border-left-color: var(--accent); }
+  .palette-item .mk { color: var(--accent); font-family: var(--mono); font-size: 11px; text-align: center; }
+  .palette-item .t {
+    font-family: var(--serif); font-variation-settings: "opsz" 20, "wght" 440;
+    font-size: 1.02rem; line-height: 1.2;
+  }
+  .palette-item .t mark {
+    background: color-mix(in oklab, var(--accent) 22%, transparent);
+    color: var(--ink); padding: 0 1px;
+  }
+  .palette-item .path {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-faint); margin-top: 3px; line-height: 1.3;
+  }
+  .palette-item .kind {
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 3px 8px; border: 1px solid var(--rule); border-radius: 3px;
+  }
+  .palette-item.active .kind { border-color: var(--accent); color: var(--accent); }
+  .palette-empty {
+    padding: 32px 20px; text-align: center; color: var(--ink-muted);
+    font-family: var(--serif); font-style: italic; font-size: .98rem;
+  }
+  .palette-foot {
+    display: flex; justify-content: space-between; gap: 24px;
+    padding: 10px 20px; border-top: 1px solid var(--rule);
+    font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .palette-foot kbd {
+    padding: 2px 6px; border: 1px solid var(--rule); border-radius: 3px;
+    background: var(--bg); color: var(--ink-muted);
+    font-family: var(--mono); font-size: 9.5px;
+    margin: 0 3px;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 80px;
+    border-top: 1px solid var(--ink);
+    padding: 36px 0 60px;
+  }
+  footer .wrap {
+    display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: start;
+  }
+  footer .colophon {
+    font-family: var(--serif); font-variation-settings: "opsz" 14, "wght" 400;
+    font-size: .95rem; max-width: 56ch; color: var(--ink-2);
+  }
+  footer .colophon .credit {
+    margin-top: 14px; padding-top: 14px;
+    border-top: 1px dashed var(--rule);
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .05em; text-transform: none;
+    line-height: 1.65; color: var(--ink-muted);
+  }
+  footer .colophon .credit a {
+    color: var(--accent); text-decoration: none;
+    border-bottom: 1px solid color-mix(in oklab, var(--accent) 40%, transparent);
+  }
+  footer .colophon .credit a:hover { border-bottom-color: var(--accent); }
+  footer .meta {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--ink-faint); text-align: right; line-height: 1.8;
+  }
+
+  /* Animations */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .stagger > * { animation: rise .55s cubic-bezier(.2,.8,.2,1) both; }
+  .stagger > *:nth-child(1)  { animation-delay: .02s; }
+  .stagger > *:nth-child(2)  { animation-delay: .05s; }
+  .stagger > *:nth-child(3)  { animation-delay: .08s; }
+  .stagger > *:nth-child(4)  { animation-delay: .11s; }
+  .stagger > *:nth-child(5)  { animation-delay: .14s; }
+  .stagger > *:nth-child(6)  { animation-delay: .17s; }
+  .stagger > *:nth-child(7)  { animation-delay: .20s; }
+  .stagger > *:nth-child(8)  { animation-delay: .23s; }
+  .stagger > *:nth-child(9)  { animation-delay: .26s; }
+  .stagger > *:nth-child(10) { animation-delay: .29s; }
+  .stagger > *:nth-child(11) { animation-delay: .32s; }
+  .stagger > *:nth-child(12) { animation-delay: .35s; }
+  .stagger > *:nth-child(13) { animation-delay: .38s; }
+  .stagger > *:nth-child(14) { animation-delay: .41s; }
+
+  .fade-in { animation: rise .5s cubic-bezier(.2,.8,.2,1) both; }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    .wrap, .bar-inner { padding-left: 20px; padding-right: 20px; }
+    .bar-inner { grid-template-columns: auto 1fr; }
+    .bar-meta { display: none; }
+    .masthead { padding-top: 32px; }
+    .masthead-sub { grid-template-columns: 1fr; }
+    .masthead-stamp { text-align: left; }
+    .detail-sub { grid-template-columns: 1fr; }
+    .standalone-map, .map-figure { padding: 16px; }
+    footer .wrap { grid-template-columns: 1fr; }
+    footer .meta { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-inner">
+    <a class="brand" href="#/"><span class="dot"></span>Správní mapy ČR</a>
+    <div class="bar-meta">Edice MMXXVI · Kraje a obce s rozšířenou působností</div>
+    <button class="search-trigger" id="search-trigger" aria-label="Hledat">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span>Hledat region nebo ORP</span>
+      <kbd>/</kbd>
+    </button>
+  </div>
+</header>
+
+<main id="view"></main>
+
+<footer>
+  <div class="wrap">
+    <div class="colophon">
+      Sbírka správních map České republiky uspořádaná podle krajů, okresů a obcí s rozšířenou působností. Mapy v plném rozlišení jsou k dispozici po rozkliknutí jednotlivých záznamů.
+      <div class="credit">
+        Mapové podklady © <a href="https://www.czso.cz/" target="_blank" rel="noopener">Český statistický úřad (ČSÚ)</a>. Veškerá autorská práva k&nbsp;mapám náleží ČSÚ; zde jsou reprodukovány pouze pro&nbsp;přehledové a vzdělávací účely.
+      </div>
+    </div>
+    <div class="meta">
+      <div><strong style="color:var(--ink)">№</strong> <span id="foot-count"></span> map</div>
+      <div>14 krajů</div>
+      <div>Zdroj — ČSÚ</div>
+    </div>
+  </div>
+</footer>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-label="Zvětšená mapa">
+  <img id="lightbox-img" alt="">
+</div>
+
+<div class="palette-overlay" id="palette" role="dialog" aria-label="Vyhledávání">
+  <div class="palette">
+    <label class="palette-input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" id="palette-input" placeholder="Hledej kraj, okres, nebo ORP…" autocomplete="off" spellcheck="false">
+      <span class="esc">Esc</span>
+    </label>
+    <div class="palette-results" id="palette-results"></div>
+    <div class="palette-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigace · <kbd>↵</kbd> otevřít</span>
+      <span id="palette-count">0 výsledků</span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- Data (filenames) ---------- */
+const FILES = [
+  "Hlavní město Praha.jpg",
+  "Jihomoravský kraj - okres Blansko - ORP Blansko.png",
+  "Jihomoravský kraj - okres Blansko - ORP Boskovice.png",
+  "Jihomoravský kraj - okres Brno-město - ORP Brno.png",
+  "Jihomoravský kraj - okres Brno-venkov - ORP Ivančice.png",
+  "Jihomoravský kraj - okres Brno-venkov - ORP Kuřim.png",
+  "Jihomoravský kraj - okres Brno-venkov - ORP Pohořelice.png",
+  "Jihomoravský kraj - okres Brno-venkov - ORP Rosice.png",
+  "Jihomoravský kraj - okres Brno-venkov - ORP Tišnov.png",
+  "Jihomoravský kraj - okres Brno-venkov - ORP Šlapanice.png",
+  "Jihomoravský kraj - okres Brno-venkov - ORP Židlochovice.png",
+  "Jihomoravský kraj - okres Břeclav - ORP Břeclav.png",
+  "Jihomoravský kraj - okres Břeclav - ORP Hustopeče.png",
+  "Jihomoravský kraj - okres Břeclav - ORP Mikulov.png",
+  "Jihomoravský kraj - okres Hodonín - ORP Hodonín.png",
+  "Jihomoravský kraj - okres Hodonín - ORP Kyjov.png",
+  "Jihomoravský kraj - okres Hodonín - ORP Veselí nad Moravou.png",
+  "Jihomoravský kraj - okres Vyškov - ORP Bučovice.png",
+  "Jihomoravský kraj - okres Vyškov - ORP Slavkov u Brna.png",
+  "Jihomoravský kraj - okres Vyškov - ORP Vyškov.png",
+  "Jihomoravský kraj - okres Znojmo - ORP Moravský Krumlov.png",
+  "Jihomoravský kraj - okres Znojmo - ORP Znojmo.png",
+  "Jihočeský kraj.png",
+  "Karlovarský kraj - okres Cheb - ORP Aš.png",
+  "Karlovarský kraj - okres Cheb - ORP Cheb.png",
+  "Karlovarský kraj - okres Cheb - ORP Mariánské Lázně.png",
+  "Karlovarský kraj - okres Karlovy Vary - ORP Karlovy Vary.png",
+  "Karlovarský kraj - okres Karlovy Vary - ORP Ostrov.png",
+  "Karlovarský kraj - okres Sokolov - ORP Kraslice.png",
+  "Karlovarský kraj - okres Sokolov - ORP Skolov.png",
+  "Kraj Vysočina.png",
+  "Královehradecký kraj.png",
+  "Liberecký kraj - okres Jablonec nad Nisou - ORP Jablonec nad Nisou.png",
+  "Liberecký kraj - okres Jablonec nad Nisou - ORP Tanvald.png",
+  "Liberecký kraj - okres Jablonec nad Nisou - ORP Železný Brod.png",
+  "Liberecký kraj - okres Liberec - ORP Frýdlant.png",
+  "Liberecký kraj - okres Liberec - ORP Liberec.png",
+  "Liberecký kraj - okres Semily - ORP Jilemnice.png",
+  "Liberecký kraj - okres Semily - ORP Semily.png",
+  "Liberecký kraj - okres Semily - ORP Turnov.png",
+  "Liberecký kraj - okres Česká Lípa - ORP Nový Bor.png",
+  "Liberecký kraj - okres Česká Lípa - ORP Česká Lípa.png",
+  "Moravskoslezský kraj.png",
+  "Olomoucký kraj.png",
+  "Pardubický kraj.png",
+  "Plzeňský kraj - okres Domažlice - ORP Domažlice.png",
+  "Plzeňský kraj - okres Domažlice - ORP Horšovský Týn.png",
+  "Plzeňský kraj - okres Klatovy - ORP Horažďovice.png",
+  "Plzeňský kraj - okres Klatovy - ORP Klatovy.png",
+  "Plzeňský kraj - okres Klatovy - ORP Sušice.png",
+  "Plzeňský kraj - okres Plzeň-jih - ORP Blovice.png",
+  "Plzeňský kraj - okres Plzeň-jih - ORP Nepomuk.png",
+  "Plzeňský kraj - okres Plzeň-jih - ORP Přeštice.png",
+  "Plzeňský kraj - okres Plzeň-jih - ORP Stod.png",
+  "Plzeňský kraj - okres Plzeň-město - ORP Plzeň.png",
+  "Plzeňský kraj - okres Plzeň-sever - ORP Kralovice.png",
+  "Plzeňský kraj - okres Plzeň-sever - ORP Nýřany.png",
+  "Plzeňský kraj - okres Rokycany - ORP Rokycany.png",
+  "Plzeňský kraj - okres Tachov - ORP Stříbro.png",
+  "Plzeňský kraj - okres Tachov - ORP Tachov.png",
+  "Středočeský kraj - okres Benešov - ORP Benešov.png",
+  "Středočeský kraj - okres Benešov - ORP Vlašim.png",
+  "Středočeský kraj - okres Benešov - ORP Votice.png",
+  "Středočeský kraj - okres Beroun - ORP Beroun.png",
+  "Středočeský kraj - okres Beroun - ORP Hořovice.png",
+  "Středočeský kraj - okres Kladno - ORP Kladno.png",
+  "Středočeský kraj - okres Kladno - ORP Slaný.png",
+  "Středočeský kraj - okres Kolín - ORP Kolín.png",
+  "Středočeský kraj - okres Kolín - ORP Český brod.png",
+  "Středočeský kraj - okres Kutná Hora - ORP Kutná Hora.png",
+  "Středočeský kraj - okres Kutná Hora - ORP Čáslav.png",
+  "Středočeský kraj - okres Mladá Boleslav - ORP Lysá nad Labem.png",
+  "Středočeský kraj - okres Mladá Boleslav - ORP Mladá Bolesllav.png",
+  "Středočeský kraj - okres Mladá Boleslav - ORP Mnichovo Hradiště.png",
+  "Středočeský kraj - okres Mělník - ORP Kralupy nad Vltavou.png",
+  "Středočeský kraj - okres Mělník - ORP Mělník.png",
+  "Středočeský kraj - okres Mělník - ORP Neratovice.png",
+  "Středočeský kraj - okres Nymburk - ORP Nymburk.png",
+  "Středočeský kraj - okres Nymburk - ORP Poděbrady.png",
+  "Středočeský kraj - okres Praha-východ - ORP Brandýs nad Labem-Stará Boleslav.png",
+  "Středočeský kraj - okres Praha-východ - ORP Říčany.png",
+  "Středočeský kraj - okres Praha-západ - ORP Černošice.png",
+  "Středočeský kraj - okres Příbram - ORP Dobříš.png",
+  "Středočeský kraj - okres Příbram - ORP Příbram.png",
+  "Středočeský kraj - okres Příbram - ORP Sedlčany.png",
+  "Středočeský kraj - okres Rakovník - ORP Rakovník.png",
+  "Zlínský kraj - okres Kroměříž - ORP Bystřice pod Hostýnem.png",
+  "Zlínský kraj - okres Kroměříž - ORP Holešov.png",
+  "Zlínský kraj - okres Kroměříž - ORP Kroměříž.png",
+  "Zlínský kraj - okres Uherské Hradiště - ORP Uherské Hradiště.png",
+  "Zlínský kraj - okres Uherské Hradiště - ORP Uherský Brod.png",
+  "Zlínský kraj - okres Vsetín - ORP Rožnov pod Radhoštěm.png",
+  "Zlínský kraj - okres Vsetín - ORP Valašské Meziříčí.png",
+  "Zlínský kraj - okres Vsetín - ORP Vsetín.png",
+  "Zlínský kraj - okres Zlín - ORP Luhačovice.png",
+  "Zlínský kraj - okres Zlín - ORP Otrokovice.png",
+  "Zlínský kraj - okres Zlín - ORP Valašské Klobouky.png",
+  "Zlínský kraj - okres Zlín - ORP Vizovice.png",
+  "Zlínský kraj - okres Zlín - ORP Zlín.png",
+  "Ústecký kraj.png"
+];
+
+/* ---------- Helpers ---------- */
+const norm = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const slug = s => norm(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const encodeSrc = name => "maps/" + name.split("/").map(encodeURIComponent).join("/");
+const collator = new Intl.Collator("cs", { sensitivity: "base" });
+
+/* ---------- Parse files into tree ---------- */
+const ORP_RE = /^(.+?) - okres (.+?) - ORP (.+?)\.(png|jpg|jpeg)$/i;
+const STANDALONE_RE = /^(.+?)\.(png|jpg|jpeg)$/i;
+
+const regionsMap = new Map();
+const allItems = []; // flat list for search
+
+function getRegion(name) {
+  if (!regionsMap.has(name)) {
+    regionsMap.set(name, {
+      name, slug: slug(name),
+      file: null, okresy: new Map(), orpCount: 0
+    });
+  }
+  return regionsMap.get(name);
+}
+
+for (const f of FILES) {
+  const m = f.match(ORP_RE);
+  if (m) {
+    const [, regionName, okresName, orpName] = m;
+    const r = getRegion(regionName);
+    if (!r.okresy.has(okresName)) r.okresy.set(okresName, { name: okresName, orps: [] });
+    const orpSlug = slug(regionName + "-" + orpName);
+    const orp = { name: orpName, okres: okresName, region: regionName, file: f, slug: orpSlug };
+    r.okresy.get(okresName).orps.push(orp);
+    r.orpCount += 1;
+    allItems.push({ type: "orp", ...orp });
+  } else {
+    const s = f.match(STANDALONE_RE);
+    if (s) {
+      const [, regionName] = s;
+      const r = getRegion(regionName);
+      r.file = f;
+    }
+  }
+}
+
+const REGIONS = Array.from(regionsMap.values()).sort((a, b) => {
+  if (a.name === "Hlavní město Praha") return -1;
+  if (b.name === "Hlavní město Praha") return 1;
+  return collator.compare(a.name, b.name);
+});
+
+for (const r of REGIONS) {
+  r.okresy = Array.from(r.okresy.values()).sort((a, b) => collator.compare(a.name, b.name));
+  for (const o of r.okresy) o.orps.sort((a, b) => collator.compare(a.name, b.name));
+  if (r.file) allItems.push({ type: "region", name: r.name, file: r.file, region: r.name, slug: r.slug });
+}
+
+const regionBySlug = new Map(REGIONS.map(r => [r.slug, r]));
+const orpBySlug = new Map(allItems.filter(i => i.type === "orp").map(i => [i.slug, i]));
+const allOrpsFlat = allItems.filter(i => i.type === "orp");
+
+document.getElementById("foot-count").textContent = FILES.length;
+
+/* ---------- Routing ---------- */
+const view = document.getElementById("view");
+function go(hash) { location.hash = hash; }
+function parseRoute() {
+  const h = (location.hash || "#/").replace(/^#/, "");
+  const parts = h.split("/").filter(Boolean);
+  if (parts.length === 0) return { name: "home" };
+  if (parts[0] === "r" && parts[1]) return { name: "region", slug: decodeURIComponent(parts[1]) };
+  if (parts[0] === "m" && parts[1]) return { name: "map", slug: decodeURIComponent(parts[1]) };
+  return { name: "home" };
+}
+
+function render() {
+  closePalette();
+  const r = parseRoute();
+  if (r.name === "home") renderHome();
+  else if (r.name === "region") renderRegion(r.slug);
+  else if (r.name === "map") renderMap(r.slug);
+  else renderHome();
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+window.addEventListener("hashchange", render);
+
+/* ---------- Escape ---------- */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" })[c]);
+
+/* ---------- Views ---------- */
+function renderHome() {
+  const totalOrps = allOrpsFlat.length;
+  const standaloneCount = REGIONS.filter(r => r.file).length;
+
+  const cards = REGIONS.map((r, i) => {
+    const isCapital = r.name === "Hlavní město Praha";
+    const idxLabel = String(i + 1).padStart(2, "0");
+    const metaTxt = r.okresy.length
+      ? `${r.okresy.length} ${r.okresy.length === 1 ? "okres" : (r.okresy.length < 5 ? "okresy" : "okresů")} · ${r.orpCount} ORP`
+      : (r.file ? "Přehledová mapa kraje" : "Bez mapy");
+    return `
+      <a class="region-card ${r.file ? "has-map" : ""}" href="#/r/${encodeURIComponent(r.slug)}">
+        <div class="idx"><span>Kraj · ${idxLabel}</span>${r.file ? `<span class="badge">Mapa</span>` : ""}</div>
+        <div class="name">${esc(r.name)}</div>
+        <div class="meta">${esc(metaTxt)}</div>
+        <div class="rule"></div>
+        <div class="arrow">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </div>
+      </a>`;
+  }).join("");
+
+  view.innerHTML = `
+    <div class="wrap fade-in">
+      <section class="masthead">
+        <div class="masthead-kicker">
+          <span>Atlas</span>
+          <span class="line"></span>
+          <span>Česká Republika</span>
+          <span class="line"></span>
+          <span>№ ${FILES.length}</span>
+        </div>
+        <h1 class="masthead-title">Správní mapy<br>krajů &amp; <em>obcí&nbsp;s&nbsp;rozšířenou<br>působností</em></h1>
+        <div class="masthead-sub">
+          <p class="masthead-lede">Editovaná sbírka map všech českých krajů a obcí s&nbsp;rozšířenou působností (ORP). Vyberte kraj na mřížce níže, nebo stiskněte <strong>/</strong> pro rychlé hledání napříč celou edicí.</p>
+          <div class="masthead-stamp">
+            <div><strong>${FILES.length}</strong> map celkem</div>
+            <div><strong>${REGIONS.length}</strong> krajů</div>
+            <div><strong>${totalOrps}</strong> ORP</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-head">
+        <h2>Kraje</h2>
+        <div class="line"></div>
+        <div class="count">${REGIONS.length} záznamů</div>
+      </div>
+
+      <section class="regions stagger">${cards}</section>
+    </div>
+  `;
+}
+
+function renderRegion(regionSlug) {
+  const r = regionBySlug.get(regionSlug);
+  if (!r) return renderHome();
+  const hasOkresy = r.okresy.length > 0;
+
+  const okresHtml = r.okresy.map((o, i) => {
+    const orps = o.orps.map(orp => `
+      <a class="orp-card" href="#/m/${encodeURIComponent(orp.slug)}">
+        <div>
+          <div class="label">ORP</div>
+          <div class="name">${esc(orp.name)}</div>
+        </div>
+        <div class="go">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        </div>
+      </a>`).join("");
+    return `
+      <section class="okres">
+        <div class="okres-head">
+          <span class="k">Okres · ${String(i+1).padStart(2,"0")}</span>
+          <h3>${esc(o.name)}</h3>
+          <div class="line"></div>
+          <span class="n">${o.orps.length} ORP</span>
+        </div>
+        <div class="orp-list stagger">${orps}</div>
+      </section>`;
+  }).join("");
+
+  const standaloneHtml = r.file ? `
+    <figure class="standalone-map">
+      <img src="${encodeSrc(r.file)}" alt="${esc(r.name)} — přehledová mapa" data-zoom>
+      <figcaption class="caption">
+        <span>Přehledová mapa kraje</span>
+        <span>© ČSÚ · ${esc(r.file)}</span>
+      </figcaption>
+    </figure>` : "";
+
+  const subtitleParts = [];
+  if (hasOkresy) subtitleParts.push(`${r.okresy.length} okresů`);
+  if (r.orpCount) subtitleParts.push(`${r.orpCount} ORP`);
+  if (r.file) subtitleParts.push("přehledová mapa kraje");
+
+  view.innerHTML = `
+    <div class="wrap fade-in">
+      <div class="detail-head">
+        <a class="crumb" href="#/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Zpět na úvod
+        </a>
+        <div class="detail-kicker">Kraj · ${String(REGIONS.indexOf(r)+1).padStart(2,"0")} / ${String(REGIONS.length).padStart(2,"0")}</div>
+        <h1 class="detail-title">${esc(r.name)}</h1>
+        <div class="detail-sub">
+          <div class="count">${subtitleParts.join(" · ") || "Bez map"}</div>
+          <div class="count">Kraj České republiky</div>
+        </div>
+      </div>
+      ${standaloneHtml}
+      ${okresHtml}
+    </div>
+  `;
+
+  view.querySelectorAll("[data-zoom]").forEach(img => img.addEventListener("click", () => openLightbox(img.src, img.alt)));
+}
+
+function renderMap(mapSlug) {
+  // Check orp first
+  const orp = orpBySlug.get(mapSlug);
+  let item = orp;
+  let region = null;
+  if (orp) {
+    region = REGIONS.find(r => r.name === orp.region);
+  } else {
+    // Check if it's a region standalone map
+    const reg = REGIONS.find(r => r.slug === mapSlug && r.file);
+    if (reg) {
+      item = { type: "region", name: reg.name, region: reg.name, file: reg.file, slug: reg.slug };
+      region = reg;
+    }
+  }
+  if (!item) return renderHome();
+
+  const isOrp = item.type === "orp";
+  const title = isOrp ? item.name : item.name;
+  const kicker = isOrp ? "Obec s rozšířenou působností" : "Přehledová mapa kraje";
+
+  // Prev/next navigation among ORPs in same region, or all standalones
+  let prev = null, next = null;
+  if (isOrp && region) {
+    const allOrps = region.okresy.flatMap(o => o.orps);
+    const idx = allOrps.findIndex(o => o.slug === item.slug);
+    prev = allOrps[idx - 1] || null;
+    next = allOrps[idx + 1] || null;
+  }
+
+  const breadcrumbs = `
+    <div class="map-breadcrumbs">
+      <a href="#/">Atlas</a>
+      <span class="sep">/</span>
+      <a href="#/r/${encodeURIComponent(region.slug)}">${esc(region.name)}</a>
+      ${isOrp ? `<span class="sep">/</span><span>okres ${esc(item.okres)}</span>` : ""}
+      <span class="sep">/</span>
+      <span style="color:var(--ink)">${esc(title)}</span>
+    </div>`;
+
+  const contextHtml = isOrp ? `
+    <dl class="map-context">
+      <div><dt>Kraj</dt><dd>${esc(region.name)}</dd></div>
+      <div><dt>Okres</dt><dd>${esc(item.okres)}</dd></div>
+      <div><dt>ORP</dt><dd>${esc(item.name)}</dd></div>
+    </dl>` : `
+    <dl class="map-context">
+      <div><dt>Kraj</dt><dd>${esc(region.name)}</dd></div>
+      <div><dt>Typ</dt><dd>Přehledová mapa</dd></div>
+    </dl>`;
+
+  const navHtml = isOrp ? `
+    <nav class="map-nav">
+      <a class="prev ${prev ? "" : "disabled"}" ${prev ? `href="#/m/${encodeURIComponent(prev.slug)}"` : ""}>
+        <span class="dir">← Předchozí ORP</span>
+        <span class="t">${prev ? esc(prev.name) : "—"}</span>
+      </a>
+      <a class="next ${next ? "" : "disabled"}" ${next ? `href="#/m/${encodeURIComponent(next.slug)}"` : ""}>
+        <span class="dir">Následující ORP →</span>
+        <span class="t">${next ? esc(next.name) : "—"}</span>
+      </a>
+    </nav>` : "";
+
+  view.innerHTML = `
+    <div class="wrap fade-in">
+      <div class="map-head">
+        <a class="crumb" href="#/r/${encodeURIComponent(region.slug)}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Zpět — ${esc(region.name)}
+        </a>
+        <div style="margin-top:20px">${breadcrumbs}</div>
+        <div class="detail-kicker" style="margin-top:4px">${kicker}</div>
+        <h1 class="map-title">${esc(title)}</h1>
+        ${contextHtml}
+      </div>
+      <figure class="map-figure">
+        <img src="${encodeSrc(item.file)}" alt="${esc(title)} — správní mapa" data-zoom>
+        <figcaption class="map-foot">
+          <span>Klikněte pro zvětšení · Esc pro zavření</span>
+          <span>© ČSÚ · ${esc(item.file)}</span>
+        </figcaption>
+      </figure>
+      ${navHtml}
+    </div>
+  `;
+
+  view.querySelectorAll("[data-zoom]").forEach(img => img.addEventListener("click", () => openLightbox(img.src, img.alt)));
+}
+
+/* ---------- Lightbox ---------- */
+const lb = document.getElementById("lightbox");
+const lbImg = document.getElementById("lightbox-img");
+function openLightbox(src, alt) {
+  lbImg.src = src; lbImg.alt = alt || "";
+  lb.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeLightbox() {
+  lb.classList.remove("open");
+  document.body.style.overflow = "";
+}
+lb.addEventListener("click", closeLightbox);
+
+/* ---------- Command palette ---------- */
+const paletteEl = document.getElementById("palette");
+const paletteInput = document.getElementById("palette-input");
+const paletteResults = document.getElementById("palette-results");
+const paletteCount = document.getElementById("palette-count");
+const paletteTrigger = document.getElementById("search-trigger");
+
+let paletteItems = []; // current flat list of matching items
+let paletteIdx = 0;
+
+const searchCorpus = [
+  ...REGIONS.map((r, i) => ({
+    key: "r:" + r.slug, kind: "Kraj", title: r.name, path: r.file ? "Přehledová mapa" : `${r.okresy.length} okresů · ${r.orpCount} ORP`,
+    search: norm(r.name), href: `#/r/${encodeURIComponent(r.slug)}`, mark: String(i+1).padStart(2,"0"),
+    group: "Kraje"
+  })),
+  ...REGIONS.filter(r => r.file).map(r => ({
+    key: "rmap:" + r.slug, kind: "Mapa", title: r.name, path: `Přehledová mapa kraje`,
+    search: norm(r.name), href: `#/m/${encodeURIComponent(r.slug)}`, mark: "◆",
+    group: "Přehledové mapy"
+  })),
+  ...allOrpsFlat.map(o => ({
+    key: "o:" + o.slug, kind: "ORP", title: o.name, path: `${o.region} · okres ${o.okres}`,
+    search: norm(o.name + " " + o.okres + " " + o.region), href: `#/m/${encodeURIComponent(o.slug)}`, mark: "·",
+    group: "Obce s rozšířenou působností"
+  }))
+];
+
+function openPalette() {
+  paletteEl.classList.add("open");
+  paletteInput.value = "";
+  paletteInput.focus();
+  paletteIdx = 0;
+  renderPalette("");
+  document.body.style.overflow = "hidden";
+}
+function closePalette() {
+  paletteEl.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function highlight(text, qnorm) {
+  if (!qnorm) return esc(text);
+  const tnorm = norm(text);
+  const idx = tnorm.indexOf(qnorm);
+  if (idx < 0) return esc(text);
+  return esc(text.slice(0, idx)) + "<mark>" + esc(text.slice(idx, idx + qnorm.length)) + "</mark>" + esc(text.slice(idx + qnorm.length));
+}
+
+function renderPalette(query) {
+  const qn = norm(query.trim());
+  let matches;
+  if (!qn) {
+    // show overview: regions + first few ORPs grouped
+    matches = searchCorpus.filter(x => x.group === "Kraje");
+  } else {
+    matches = searchCorpus
+      .map(x => {
+        const i = x.search.indexOf(qn);
+        if (i < 0) return null;
+        // scoring: exact title match > starts with > contains; prefer shorter titles
+        const titleNorm = norm(x.title);
+        const ti = titleNorm.indexOf(qn);
+        let score = 1000;
+        if (ti === 0) score -= 500;
+        else if (ti > 0) score -= 200;
+        score += titleNorm.length;
+        score -= (x.kind === "Kraj" ? 50 : x.kind === "Mapa" ? 30 : 0);
+        return { ...x, score };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.score - b.score)
+      .slice(0, 50);
+  }
+  paletteItems = matches;
+  paletteIdx = 0;
+
+  if (!matches.length) {
+    paletteResults.innerHTML = `<div class="palette-empty">Nic nenalezeno pro „${esc(query)}"</div>`;
+    paletteCount.textContent = "0 výsledků";
+    return;
+  }
+
+  // Group
+  const groups = new Map();
+  for (const m of matches) {
+    if (!groups.has(m.group)) groups.set(m.group, []);
+    groups.get(m.group).push(m);
+  }
+  let html = "";
+  let runIdx = 0;
+  for (const [gname, items] of groups) {
+    html += `<div class="palette-group"><span>${esc(gname)}</span><span>${items.length}</span></div>`;
+    for (const it of items) {
+      html += `
+        <a class="palette-item ${runIdx === 0 ? "active" : ""}" data-idx="${runIdx}" href="${it.href}">
+          <span class="mk">${esc(it.mark)}</span>
+          <span>
+            <div class="t">${highlight(it.title, qn)}</div>
+            <div class="path">${esc(it.path)}</div>
+          </span>
+          <span class="kind">${esc(it.kind)}</span>
+        </a>`;
+      runIdx++;
+    }
+  }
+  paletteResults.innerHTML = html;
+  paletteCount.textContent = `${matches.length} ${matches.length === 1 ? "výsledek" : (matches.length < 5 ? "výsledky" : "výsledků")}`;
+
+  paletteResults.querySelectorAll(".palette-item").forEach(el => {
+    el.addEventListener("mouseenter", () => setPaletteIdx(parseInt(el.dataset.idx, 10)));
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      go(el.getAttribute("href"));
+      closePalette();
+    });
+  });
+}
+
+function setPaletteIdx(i) {
+  if (!paletteItems.length) return;
+  paletteIdx = (i + paletteItems.length) % paletteItems.length;
+  paletteResults.querySelectorAll(".palette-item").forEach(el => {
+    const idx = parseInt(el.dataset.idx, 10);
+    el.classList.toggle("active", idx === paletteIdx);
+    if (idx === paletteIdx) el.scrollIntoView({ block: "nearest" });
+  });
+}
+
+paletteInput.addEventListener("input", (e) => renderPalette(e.target.value));
+paletteInput.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowDown") { e.preventDefault(); setPaletteIdx(paletteIdx + 1); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); setPaletteIdx(paletteIdx - 1); }
+  else if (e.key === "Enter") {
+    e.preventDefault();
+    const it = paletteItems[paletteIdx];
+    if (it) { go(it.href); closePalette(); }
+  } else if (e.key === "Escape") { e.preventDefault(); closePalette(); }
+});
+paletteEl.addEventListener("click", (e) => {
+  if (e.target === paletteEl) closePalette();
+});
+paletteTrigger.addEventListener("click", openPalette);
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (lb.classList.contains("open")) closeLightbox();
+    else if (paletteEl.classList.contains("open")) closePalette();
+  }
+  if (paletteEl.classList.contains("open")) return;
+  const tag = (document.activeElement?.tagName || "").toLowerCase();
+  if (tag === "input" || tag === "textarea") return;
+  if (e.key === "/" || (e.key === "k" && (e.metaKey || e.ctrlKey))) {
+    e.preventDefault();
+    openPalette();
+  }
+});
+
+/* ---------- Boot ---------- */
+render();
+</script>
+</body>
+</html>
